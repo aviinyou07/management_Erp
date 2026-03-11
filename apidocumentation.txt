@@ -1,0 +1,372 @@
+Samajh gaya 👍
+Tum chahte ho **saari APIs ek jagah list ho** taki **Postman / Thunder Client me easily test kar sako** — jaise **LinkedIn feed system**.
+
+Main **sab APIs organized karke de raha hoon**:
+Users, Posts, Likes, Comments, Shares — **sab ek place par**.
+
+---
+
+# 🚀 Base URL
+
+```
+http://localhost:5000/api
+```
+
+---
+
+# 👤 USER APIs
+
+## 1️⃣ Get User Profile
+
+```
+GET /api/users/profile/:id
+```
+
+Example
+
+```
+GET /api/users/profile/1
+```
+
+Response
+
+```json
+{
+"id":1,
+"name":"Rishu",
+"country":"India",
+"badge":"NRI Hiring",
+"followers_count":0
+}
+```
+
+---
+
+## 2️⃣ Follow User
+
+```
+POST /api/users/follow/:id
+```
+
+Example
+
+```
+POST /api/users/follow/2
+```
+
+Body
+
+```json
+{
+"userId":1
+}
+```
+
+Meaning:
+
+```
+User 1 follows User 2
+```
+
+---
+
+## 3️⃣ Unfollow User
+
+```
+POST /api/users/unfollow/:id
+```
+
+Body
+
+```json
+{
+"userId":1
+}
+```
+
+---
+
+# 📝 POST APIs
+
+---
+
+## 4️⃣ Create Post
+
+```
+POST /api/posts/create
+```
+
+Body
+
+```json
+{
+"user_id":1,
+"content":"Hiring MERN Developer",
+"tags":["mern","hiring"]
+}
+```
+
+---
+
+## 5️⃣ Get Single Post
+
+```
+GET /api/posts/:postId
+```
+
+Example
+
+```
+GET /api/posts/1
+```
+
+---
+
+# 🌎 FEED APIs
+
+---
+
+## 6️⃣ Country Feed
+
+Shows posts from **same country users**
+
+```
+GET /api/posts/feed/country
+```
+
+Query
+
+```
+?userId=1&page=1&limit=10
+```
+
+Example
+
+```
+GET /api/posts/feed/country?userId=1&page=1&limit=10
+```
+
+---
+
+## 7️⃣ Worldwide Feed
+
+Shows **all posts**
+
+```
+GET /api/posts/feed/worldwide
+```
+
+Example
+
+```
+GET /api/posts/feed/worldwide?page=1&limit=10
+```
+
+---
+
+## 8️⃣ Following Feed
+
+Shows posts from **people you follow**
+
+```
+GET /api/posts/feed/following
+```
+
+Example
+
+```
+GET /api/posts/feed/following?userId=1&page=1&limit=10
+```
+
+---
+
+# ❤️ LIKE APIs
+
+---
+
+## 9️⃣ Like Post
+
+```
+POST /api/posts/:postId/like
+```
+
+Example
+
+```
+POST /api/posts/3/like
+```
+
+Body
+
+```json
+{
+"userId":1
+}
+```
+
+---
+
+## 🔟 Unlike Post
+
+```
+POST /api/posts/:postId/unlike
+```
+
+Body
+
+```json
+{
+"userId":1
+}
+```
+
+---
+
+# 💬 COMMENT APIs
+
+---
+
+## 1️⃣1️⃣ Add Comment
+
+```
+POST /api/comments/posts/:postId/comment
+```
+
+Example
+
+```
+POST /api/comments/posts/2/comment
+```
+
+Body
+
+```json
+{
+"userId":1,
+"content":"Great opportunity!"
+}
+```
+
+---
+
+## 1️⃣2️⃣ Reply to Comment
+
+```
+POST /api/comments/:commentId/reply
+```
+
+Example
+
+```
+POST /api/comments/5/reply
+```
+
+Body
+
+```json
+{
+"userId":2,
+"content":"Interested"
+}
+```
+
+---
+
+## 1️⃣3️⃣ Get All Comments of Post
+
+```
+GET /api/comments/posts/:postId/comments
+```
+
+Example
+
+```
+GET /api/comments/posts/2/comments
+```
+
+---
+
+# 🔁 SHARE API
+
+---
+
+## 1️⃣4️⃣ Share Post
+
+```
+POST /api/posts/:postId/share
+```
+
+Example
+
+```
+POST /api/posts/2/share
+```
+
+Response
+
+```json
+{
+"message":"Post shared"
+}
+```
+
+---
+
+# 📊 Complete API List
+
+| Feature        | API                                      |
+| -------------- | ---------------------------------------- |
+| User Profile   | GET /api/users/profile/:id               |
+| Follow         | POST /api/users/follow/:id               |
+| Unfollow       | POST /api/users/unfollow/:id             |
+| Create Post    | POST /api/posts/create                   |
+| Single Post    | GET /api/posts/:postId                   |
+| Country Feed   | GET /api/posts/feed/country              |
+| Worldwide Feed | GET /api/posts/feed/worldwide            |
+| Following Feed | GET /api/posts/feed/following            |
+| Like Post      | POST /api/posts/:postId/like             |
+| Unlike Post    | POST /api/posts/:postId/unlike           |
+| Like Comments  | POST /api/posts/comments/6/like          |
+| UnLike Comments| POST /api/posts/comments/6/unlike        |
+| Add Comment    | POST /api/comments/posts/:postId/comment |
+| Reply Comment  | POST /api/comments/:commentId/reply      |
+| Get Comments   | GET /api/comments/posts/:postId/comments |
+| Share Post     | POST /api/posts/:postId/share            |
+
+Total APIs = **14**
+
+---
+
+# 🧪 Testing Order (Important)
+
+Test APIs in this order:
+
+1️⃣ Create Users (SQL)
+2️⃣ Create Post
+3️⃣ Follow User
+4️⃣ Like Post
+5️⃣ Comment
+6️⃣ Reply
+7️⃣ Test Feed APIs
+
+---
+
+# ⭐ Bonus (Very Useful)
+
+If you want, I can also show you **one powerful feature used in LinkedIn feeds**:
+
+Return response like this:
+
+```json
+{
+"post_id":1,
+"user_name":"Rishu",
+"content":"Hiring MERN Developer",
+"likes_count":10,
+"comments_count":5,
+"isLiked":true,
+"isFollowing":false
+}
+```
+
+This makes your API **look like real production social media backend**.
