@@ -1,13 +1,11 @@
-const express = require("express");
+const router=require("express").Router();
+const task=require("../controllers/taskController");
 
-const router = express.Router();
+router.get("/",task.getTasks);
+router.get("/:id",task.getTask);
+router.post("/",task.createTask);
+router.put("/:id",task.updateTask);
+router.delete("/:id",task.deleteTask);
+router.put("/bulk/update",task.bulkUpdate);
 
-const controller = require("../controllers/taskController");
-
-router.post("/", controller.createTask);
-
-router.get("/", controller.getTasks);
-
-router.put("/:id", controller.updateTask);
-
-module.exports = router;
+module.exports=router;

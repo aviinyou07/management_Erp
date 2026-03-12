@@ -1,130 +1,46 @@
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const  {User} = require("../models/User");
-const TeamMember = require("../models/TeamMember");
-const Team = require("../models/Team");
+const db=require("../config/db");
+const bcrypt=require("bcryptjs");
+const jwt=require("jsonwebtoken");
 
+exports.register=(req,res)=>{
 
-// REGISTER
-exports.register = async (req, res) => {
-  try {
+const {name,email,password}=req.body;
 
-    const { name, email, password } = req.body;
+const hash=bcrypt.hashSync(password,10);
 
-    if (!name || !email || !password) {
-      return res.status(400).json({
-        message: "All fields are required"
-      });
-    }
- 
-    // check existing user
-    const existingUser = await User.findOne({
-      where: { email }
-    });
+db.query(
+"INSERT INTO users(name,email,password) VALUES (?,?,?)",
+[name,email,hash],
+(err,result)=>{
 
-    if (existingUser) {
-      return res.status(409).json({
-        message: "User already exists"
-      });
-    }
+if(err) return res.json(err);
 
-    // hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
+res.json("User Registered");
 
-    // create user
-    const user = await User.create({
-      name,
-      email,
-      password: hashedPassword
-    });
+});
 
-    res.status(201).json({
-      message: "User registered successfully",
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email
-      }
-    });
+}
 
-  } catch (error) {
-  console.log(error);
-    res.status(500).json({
-      message: "Server error",
-      error: error.message
-    });
+exports.login=(req,res)=>{
 
-  }
-};
+const {email,password}=req.body;
 
+db.query(
+"SELECT * FROM users WHERE email=?",
+[email],
+(err,data)=>{
 
-// LOGIN
-exports.login = async (req, res) => {
- 
-  try {
+if(data.length===0)
+return res.json("User not found");
 
-    const { email, password } = req.body;
+const valid=bcrypt.compareSync(password,data[0].password);
 
-    if (!email || !password) {
-      return res.status(400).json({
-        message: "Email and password required"
-      });
-    }
+if(!valid) return res.json("Wrong password");
 
-    // find user
-    const user = await User.findOne({
-      where: { email }
-    });
+const token=jwt.sign({id:data[0].id},"secret");
 
-    if (!user) {
-      return res.status(401).json({
-        message: "Invalid email or password"
-      });
-    }
+res.json({token});
 
-    // compare password
-    const isMatch = await bcrypt.compare(password, user.password);
+});
 
-    if (!isMatch) {
-      return res.status(401).json({
-        message: "Invalid email or password"
-      });
-    }
-
-
-      const teams = await TeamMember.findAll({
-      where: { userId: user.id },
-      include: [
-        {
-          model: Team,
-          attributes: ["id", "teamName", "projectName", "status"]
-        }
-      ]
-    });
-    // create token
-    const token = jwt.sign(
-      { id: user.id, email: user.email,role:"user" },process.env.JWT_SECRET ||
-      "SECRET_KEY",
-      
-    );
-
-    res.json({
-      message: "Login successful",
-      token,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email
-      },
-      teams
-    });
-
-  } catch (error) {
-
-    res.status(500).json({
-      message: "Server error",
-      error: error.message
-    });
-
-  }
-};
+}
