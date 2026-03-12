@@ -1,0 +1,195 @@
+{
+  "info": {
+    "name": "HR Leave Management API",
+    "description": "Complete Postman collection for HR Leave Management System.\n\nSetup:\n1. Set {{baseUrl}} = http://localhost:3000\n2. Login and copy the token into {{token}}",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "token",   "value": "PASTE_JWT_HERE" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jane Smith\",\n  \"email\": \"jane@company.com\",\n  \"password\": \"Password1\",\n  \"role\": \"employee\",\n  \"department\": \"Engineering\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.token) {",
+                  "  pm.collectionVariables.set('token', res.data.token);",
+                  "  console.log('Token saved.');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@company.com\",\n  \"password\": \"Employee@123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/auth/profile"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Leave",
+      "item": [
+        {
+          "name": "Get Leave Balance",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/leave/balance"
+          }
+        },
+        {
+          "name": "Apply for Leave",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/leave/apply",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"leaveType\": \"Annual\",\n  \"startDate\": \"2026-04-10\",\n  \"endDate\": \"2026-04-12\",\n  \"reason\": \"Family vacation\"\n}"
+            }
+          }
+        },
+        {
+          "name": "My Leave Requests",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/leave/my-requests"
+          }
+        },
+        {
+          "name": "All Leave Requests (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/leave/all-requests?status=Pending",
+              "query": [{ "key": "status", "value": "Pending" }]
+            }
+          }
+        },
+        {
+          "name": "Approve / Reject Leave (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/leave/update-status/1",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Approved\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Leave Calendar",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/leave/calendar"
+          }
+        },
+        {
+          "name": "Download Summary (PDF)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/leave/summary/download?format=pdf",
+              "query": [{ "key": "format", "value": "pdf" }]
+            }
+          }
+        },
+        {
+          "name": "Download Summary (Excel)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/leave/summary/download?format=excel",
+              "query": [{ "key": "format", "value": "excel" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Holidays",
+      "item": [
+        {
+          "name": "Get All Holidays",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/holidays?year=2026",
+              "query": [{ "key": "year", "value": "2026" }]
+            }
+          }
+        },
+        {
+          "name": "Add Holiday (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/holidays",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Eid ul-Fitr\",\n  \"date\": \"2026-03-31\",\n  \"type\": \"Festival Holiday\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Holiday (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/holidays/1"
+          }
+        }
+      ]
+    }
+  ]
+}

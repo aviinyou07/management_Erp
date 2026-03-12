@@ -1,0 +1,54 @@
+const express = require("express");
+const { body } = require("express-validator");
+const router = express.Router();
+const { register, login, profile } = require("../controllers/auth.controller");
+const { authenticate } = require("../middleware/auth.middleware");
+const { validate } = require("../middleware/validate.middleware");
+
+// POST /auth/register
+router.post(
+  "/register",
+  [
+    body("name")
+      .trim()
+      .notEmpty().withMessage("Name is required.")
+      .isLength({ min: 2, max: 100 }).withMessage("Name must be 2–100 characters."),
+    body("email")
+      .trim()
+      .notEmpty().withMessage("Email is required.")
+      .isEmail().withMessage("Invalid email format.")
+      .normalizeEmail(),
+    body("password")
+      .notEmpty().withMessage("Password is required.")
+      .isLength({ min: 8 }).withMessage("Password must be at least 8 characters.")
+      .matches(/[A-Z]/).withMessage("Password must contain at least one uppercase letter.")
+      .matches(/[0-9]/).withMessage("Password must contain at least one number."),
+    body("role")
+      .optional()
+      .isIn(["employee", "admin"]).withMessage("Role must be employee or admin."),
+    body("department").optional().trim().isLength({ max: 100 }),
+  ],
+  validate,
+  register
+);
+
+// POST /auth/login
+router.post(
+  "/login",
+  [
+    body("email")
+      .trim()
+      .notEmpty().withMessage("Email is required.")
+      .isEmail().withMessage("Invalid email format.")
+      .normalizeEmail(),
+    body("password")
+      .notEmpty().withMessage("Password is required."),
+  ],
+  validate,
+  login
+);
+
+// GET /auth/profile  (protected)
+router.get("/profile", authenticate, profile);
+
+module.exports = router;
